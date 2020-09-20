@@ -1,5 +1,10 @@
 package db
 
+import (
+	"errors"
+	"os"
+)
+
 type Joke struct {
 	Id  int    `json:"id"`
 	Str string `json:"str"`
@@ -13,13 +18,9 @@ type JokeDatabase interface {
 	Delete(joke_id int, user_id int) error
 }
 
-func DBInit(max_connections int) JokeDatabase {
-	if true {
-		jdb, err := PsqlInit(max_connections)
-		if err != nil {
-			panic(err)
-		}
-		return jdb
+func Init() (JokeDatabase, error) {
+	if pg_url := os.Getenv("PG_URL"); len(pg_url) > 0 {
+		return PsqlInit(pg_url)
 	}
-	return nil
+	return nil, errors.New("[db/Init] No db specified")
 }
